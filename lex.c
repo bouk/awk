@@ -94,9 +94,13 @@ Keyword keywords[] = {  /* keep sorted: binary searched */
 
 #ifdef NDEBUG
 #define  RET(x)  { return x; }
+#define  RETS(x, A) {return x;}
+#define  RETI(x, A) {return x;}
 #else
 char *tokname (int tok);
 #define  RET(x)  { if(dbg) errprintf("lex %s\n", tokname(x)); return x; }
+#define RETS(x, A) { if(dbg) errprintf("lex %s (\"%s\")\n", tokname(x), A); return x; }
+#define RETI(x, A) { if(dbg) errprintf("lex %s (%d)\n", tokname(x), A); return x; }
 #endif
 
 int peek (void)
@@ -216,7 +220,7 @@ int yylex (void)
     {
       yylval.cp = setsymtab (buf, tostring (buf), atof (buf), CON | NUM, symtab);
       /* should this also have STR set? */
-      RET (NUMBER)
+      RETS (NUMBER, buf);
     }
 
     yylval.i = c;
@@ -324,7 +328,7 @@ int yylex (void)
       }
       else if (peek () == '=')
       {
-        input (); yylval.i = ADDEQ; RET (ASGNOP)
+        input (); yylval.i = ADDEQ; RETS (ASGNOP, "+=")
       }
       else
         RET ('+')
@@ -336,7 +340,7 @@ int yylex (void)
       }
       else if (peek () == '=')
       {
-        input (); yylval.i = SUBEQ; RET (ASGNOP)
+        input (); yylval.i = SUBEQ; RETS (ASGNOP, "-=")
       }
       else
         RET ('-')
@@ -344,14 +348,14 @@ int yylex (void)
     case '*':
       if (peek () == '=')
       {  /* *= */
-        input (); yylval.i = MULTEQ; RET (ASGNOP)
+        input (); yylval.i = MULTEQ; RETS (ASGNOP, "*=")
       }
       else if (peek () == '*')
       {  /* ** or **= */
         input ();  /* eat 2nd * */
         if (peek () == '=')
         {
-          input (); yylval.i = POWEQ; RET (ASGNOP)
+          input (); yylval.i = POWEQ; RETS (ASGNOP, "**=")
         }
         else 
           RET (POWER)
@@ -365,7 +369,7 @@ int yylex (void)
     case '%':
       if (peek () == '=')
       {
-        input (); yylval.i = MODEQ; RET (ASGNOP)
+        input (); yylval.i = MODEQ; RETS (ASGNOP, "%=")
       }
       else
         RET ('%')
@@ -373,7 +377,7 @@ int yylex (void)
     case '^':
       if (peek () == '=')
       {
-        input (); yylval.i = POWEQ; RET (ASGNOP)
+        input (); yylval.i = POWEQ; RETS (ASGNOP, "^=")
       }
       else
         RET (POWER)
@@ -395,7 +399,7 @@ int yylex (void)
           RET (INDIRECT)
         }
         yylval.cp = setsymtab (buf, "", 0.0, STR | NUM, symtab);
-        RET (IVAR)
+        RETS (IVAR, buf);
       }
       else if (c == 0)
       {  /*  */
@@ -529,7 +533,7 @@ int string (void)
   s = tostring (buf);
   *bp++ = ' '; *bp++ = 0;
   yylval.cp = setsymtab (buf, s, 0.0, CON | STR | DONTFREE, symtab);
-  RET (STRING)
+  RETS (STRING, buf)
 }
 
 

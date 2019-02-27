@@ -1243,8 +1243,7 @@ Cell *assign (Node **a, int n)
     else if (isnum (y))
       setfval (x, getfval (y));
     else
-      funnyvar (y, "read value of");
-    tempfree (y);
+      funnyvar (y, "read value of");    tempfree (y);
     return(x);
   }
   xf = getfval (x);

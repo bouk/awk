@@ -120,7 +120,8 @@ int main(int argc, char *argv[])
 	char buf[200], name[200], def[200];
 
 	printf("#include <stdio.h>\n");
-	printf("#include \"awk.h\"\n");
+  printf ("#include <string.h>\n");
+  printf("#include \"awk.h\"\n");
 	printf("#include \"ytab.h\"\n\n");
 	for (i = SIZE; --i >= 0; )
 		names[i] = "";
@@ -158,14 +159,19 @@ int main(int argc, char *argv[])
 			printf("\t%s,\t/* %s */\n", table[i], names[i]);
 	printf("};\n\n");
 
-	printf("char *tokname(int n)\n");	/* print a tokname() function */
-	printf("{\n");
-	printf("	static char buf[100];\n\n");
-	printf("	if (n < FIRSTTOKEN || n > LASTTOKEN) {\n");
-	printf("		sprintf(buf, \"token %%d\", n);\n");
-	printf("		return buf;\n");
-	printf("	}\n");
-	printf("	return printname[n-FIRSTTOKEN];\n");
-	printf("}\n");
+  /* print a tokname() function */
+	printf(
+    "char *tokname(int n)\n"
+    "{\n"
+    "  static char buf[100];\n\n"
+    "  if (n < ' ' || n > LASTTOKEN)\n"
+    "    sprintf(buf, \"token %%d\", n);\n"
+    "  else if (n < FIRSTTOKEN)\n"
+    "    sprintf (buf, \"token \'%%c\'\", (char)n);\n"
+    "  else\n"
+    "    strcpy (buf, printname[n-FIRSTTOKEN]);\n"
+    "  return buf;\n"
+    "}\n"
+  );
 	return 0;
 }

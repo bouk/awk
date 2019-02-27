@@ -178,7 +178,7 @@ int main (int argc, char *argv[])
         if (dbg > 1)
           yydebug = 1;
       }
-      errprintf ("Debug level is %d", dbg);
+      errprintf ("Debug level is %d\n", dbg);
 #endif
       break;
 
@@ -218,7 +218,7 @@ int main (int argc, char *argv[])
   {
     compile_time = 0;
 #ifndef NDEBUG
-    if (dbg > 2)
+    if (dbg > 3)
       print_tree (winner, 1);
 #endif
     run (winner);
@@ -322,22 +322,30 @@ void print_tree (Node *n, int indent)
 {
   int i;
 
-  errprintf ("%*cNode 0x%p %s", indent, ' ', n, tokname (n->nobj));
+  errprintf ("%*cNode 0x%p %s at line %d", indent, ' ', n, tokname (n->nobj), n->lineno);
   while (n)
   {
-    errprintf (" type %s", n->ntype == NVALUE ? "value" : n->ntype == NSTAT ? "statement" : "expression");
+    errprintf (" type %s", (n->ntype == NVALUE) ? "value" : (n->ntype == NSTAT) ? "statement" : "expression");
     errprintf (" %d arguments\n", n->args);
-    for (i = 0; i < n->args; i++)
+    if (n->args > 10)
     {
-      if (n->ntype == NVALUE)
-        print_cell ((Cell *)n->narg[i], indent + 1);
-      else if (n->narg[i])
-        print_tree (n->narg[i], indent + 1);
-      else
-        errprintf ("%*cNull arg\n", indent + 1, ' ');
+      errprintf ("Wierd");
+      break;
     }
-    if (n = n->nnext)
-      errprintf ("%*cNext node 0x%p %s", indent, ' ', n, tokname (n->nobj));
+    else
+    {
+      for (i = 0; i < n->args; i++)
+      {
+        if (n->ntype == NVALUE)
+          print_cell ((Cell *)n->narg[i], indent + 1);
+        else if (n->narg[i])
+          print_tree (n->narg[i], indent + 1);
+        else
+          errprintf ("%*cNull arg\n", indent + 1, ' ');
+      }
+      if (n = n->nnext)
+        errprintf ("%*cNext node 0x%p %s", indent, ' ', n, tokname (n->nobj));
+    }
   }
 }
 #endif

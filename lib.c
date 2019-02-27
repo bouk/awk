@@ -425,7 +425,7 @@ void fldbld (void)
     for (j = 0; j <= lastfld; j++)
     {
       p = fldtab[j];
-      printf ("field %d (%s): |%s|\n", j, p->nval, p->sval);
+      errprintf ("field %d (%s): |%s|\n", j, p->nval, p->sval);
     }
   }
 #endif
