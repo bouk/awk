@@ -5,16 +5,16 @@ rem
 
 awk --version
 for %%i in (tests\*.tst) do (
-  .\echo -n "Running test %%~ni... "
+  echo | set /p dummy="Running test %%~ni... "
   maketest %%i
   awk -f %%~ni.awk %%~ni.in >%%~ni.out
   fc /A %%~ni.ref %%~ni.out >NUL
   if errorlevel 1 (
-    .\echo failed
+    echo failed
     fc /A %%~ni.ref %%~ni.out
   ) else (
     del %%~ni.awk %%~ni.in %%~ni.ref %%~ni.out
-    .\echo ok
+    echo ok
   )
 )
 
